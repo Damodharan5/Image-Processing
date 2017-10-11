@@ -1,0 +1,8 @@
+Check this link: https://stackoverflow.com/questions/46046564/cuda-struck-with-4k-image-processing?noredirect=1#comment79128508_46046564
+-----------------------------------------------------------------------------------------------------------------------------------------
+You are not doing proper cuda error checking on the kernel call. My guess is 1. 
+You are compiling for the default GPU target of compute_20, sm_20 instead of the correct one for your GPU. 
+2. Your kernel launch is actually failing, because 99532800/256 exceeds the maximum grid X dimension (65535) for a cc2.0 device. 
+My guess is your code will start working differently if you compile for the correct GPU target to match your 940MX (compute_50,sm_50). 
+With a much smaller BMP file you would not see this issue. Moral: always do proper error checking – Robert Crovella Sep 6 at 19:24
+-----------------------------------------------------------------------------------------------------------------------------------------
