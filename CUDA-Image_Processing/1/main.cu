@@ -1,3 +1,4 @@
+//Contrast Correction using CUDA
 #include "headerinc.h"
 
 #define size_seek(a) ((a) == 24 ? 54:1078)
