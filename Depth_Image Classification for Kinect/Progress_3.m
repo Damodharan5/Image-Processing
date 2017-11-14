@@ -34,61 +34,60 @@ labelCount = size(label);
 
 
 %CNN architecture starts here. Adding one layer by layer
-
+gpuDevice(1);
+disp(gpuDevice());
 layers = [
 
     imageInputLayer([imgSize 1])
-    
-    convolution2dLayer(3,32,'Padding',1)
+    %Input layer same as the number of pixels in the input image
+    convolution2dLayer(7,32,'Padding',1,'Stride',3)
     batchNormalizationLayer
     reluLayer
-    maxPooling2dLayer(2,'Stride',2)
-
-    convolution2dLayer(3,64,'Padding',1)
+    maxPooling2dLayer(3,'Stride',2)
+	
+    convolution2dLayer(5,64,'Padding',1,'Stride',2)%
     batchNormalizationLayer
     reluLayer
  
-    convolution2dLayer(5,128,'Padding',1)
+    convolution2dLayer(3,150,'Padding',1,'Stride',1)%
     batchNormalizationLayer
     reluLayer
     maxPooling2dLayer(3,'Stride',2)
     
-    fullyConnectedLayer(15)
-    reluLayer
-    dropoutLayer(0.3)
+    fullyConnectedLayer(30)
+    dropoutLayer(0.6)
     
-    fullyConnectedLayer(10)
-    reluLayer
-    dropoutLayer(0.3)
+    fullyConnectedLayer(25)%
+    dropoutLayer(0.6)
     
     fullyConnectedLayer(7)
     softmaxLayer
-    classificationLayer];
-
-	
+    classificationLayer];	
 	
 	
 %Finding the proper initial learning rate by sweeping
-%Using sgdm function and maxEpochs as 14.
-%Now Fixed inital learning rate 0.000085
-i = 85;
+%Using sgdm function and maxEpochs as 15.
+%Now Fixed inital learning rate 0.005
+i = 500; %200->500
 figure;title(strcat('LearningRate of ',num2str(0.00001*i)));
-options = trainingOptions('sgdm','MaxEpochs',14, ...
+options = trainingOptions('sgdm','MaxEpochs',13, ...
 	'InitialLearnRate',0.00001*i,'OutputFcn',@plotInitlearningRate,'ExecutionEnvironment','GPU');  
 
 %% Train the Network Using Training Data
 % Train the network you defined in layers, using the training data and the
 % training options you defined in the previous steps.
-tic;
 convnet = trainNetwork(trainData,layers,options);
-disp('Time to train');
-toc;
+disp(gpuDevice());
 save convnet; %Save the trained CNN
 
 disp('Time to test 280 images');
-tic;
+%Use timeit to calculate the correct timings insted of tic and toc.
+%tic;
+f = @()classify(convnet,testData);
+disp(timeit(f));
 YTest = classify(convnet,testData);
-toc;
+%YTest = classify(convnet,testData);
+%toc;
 TTest = testData.Labels;
 
 %% 
@@ -98,7 +97,7 @@ TTest = testData.Labels;
 
 % %Plot the confusion matrix
 % 
- figure;imshow(C, [], 'InitialMagnification', 'fit');title(strcat('Confusion Matrix for ',num2str(0.0001*i)));
+ figure;imshow(C, [], 'InitialMagnification', 'fit');title(strcat('Confusion Matrix for ',num2str(0.00001*i)));
  colorbar;
  axis on;
 % 
@@ -124,4 +123,8 @@ TTest = testData.Labels;
  set(hStrings,{'Color'},num2cell(textColors,2)); % Change the text colors
 
 disp(C);
+
+accuracy = sum(YTest == TTest)/numel(TTest);   
+X = sprintf('Accuracy: %f',accuracy);
+disp(X);
 
