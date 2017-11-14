@@ -1,5 +1,5 @@
 # Depth Image Analysis using Convolution Neural Network
-This is an academic project that I am currently working on. So far I am getting 94.71% accuracy.
+This is an academic project that I am currently working on. So far I am getting 98.21% accuracy.
 ### Training Data Samples
 ![Training Data Samples](https://github.com/Damodharan5/Image-Processing/blob/master/Depth_Image%20Classification%20for%20Kinect/training_data_samples.PNG)
 ### Learning rate
